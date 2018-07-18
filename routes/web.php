@@ -12,12 +12,34 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('login');
 });
 
-Route::get('admin', function () {
-    return view('admin.test');
+Route::get('login','AuthController@getLogin')->name('get_login');
+Route::post('login','AuthController@login')->name('login');
+Route::get('logout','AuthController@logout')->name('logout');
+
+Route::prefix('admin')->name('admin.')->group(function (){
+    Route::get('/','AdminController@getDashboard')->name('dashboard');
+    Route::get('teacher_leave_management','AdminController@getTeacherLeaveManagement')->name('get_teacher_leave_management');
+    Route::get('student_leave_management','AdminController@getStudentLeaveManagement')->name('get_student_leave_management');
+    Route::get('teacher_management','AdminController@getTeacherManagement')->name('get_teacher_management');
+    Route::get('student_management','AdminController@getStudentManagement')->name('get_student_management');
 });
-Route::get('login',function (){
-    return view('login');
+
+Route::prefix('teacher')->name('teacher.')->group(function (){
+    Route::get('/','TeacherController@getDashboard')->name('dashboard');
+    Route::get('leave_management','TeacherController@getLeaveManagement')->name('get_leave_management');
+    Route::get('student_leave_management','TeacherController@getStudentLeaveManagement')->name('get_student_leave_management');
+    Route::get('add_leave','TeacheController@getAddLeave')->name('get_add_leave');
+    Route::get('edit_leave','TeacheController@getEditLeave')->name('get_edit_leave');
+
+});
+
+Route::prefix('student')->name('student.')->group(function (){
+    Route::get('/','StudentController@getDashboard')->name('dashboard');
+    Route::get('leave_management','StudentController@getLeaveManagement')->name('get_leave_management');
+    Route::get('add_leave','StudentController@getAddLeave')->name('get_add_leave');
+    Route::get('edit_leave','StudentController@getEditLeave')->name('get_edit_leave');
+
 });

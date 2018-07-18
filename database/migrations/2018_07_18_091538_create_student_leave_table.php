@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateLeaveTable extends Migration
+class CreateStudentLeaveTable extends Migration
 {
     /**
      * Run the migrations.
@@ -35,6 +35,6 @@ class CreateLeaveTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('leave');
+        Schema::dropIfExists('student_leave');
     }
 }
