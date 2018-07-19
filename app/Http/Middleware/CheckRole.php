@@ -26,7 +26,7 @@ class CheckRole
                 return response(view('admin.un_authenticate'));
             }
         }else{
-            abort(403, 'Unauthorized action.');
+            return redirect()->route('login');
         }
 
 

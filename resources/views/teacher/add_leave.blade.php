@@ -1,6 +1,6 @@
 @extends('admin.master')
 
-@section('page_title','Teacher')
+@section('page_title','Teacher | Add Leave')
 
 @section('stylesheet')
     <!-- daterange picker -->
@@ -18,26 +18,54 @@
                 <div class="box-header with-border">
                     <h3>Add Leave</h3>
                 </div>
-                <form role="form" method="POST" action="">
+                <form role="form" method="POST" action="{{ route('teacher.add_leave') }}">
+                    @csrf
+
+                    @if($errors->has('add_leave'))
+                        <label class="text-danger">{{ $errors->first('add_leave') }}</label>
+                    @endif
                     <div class="box-body">
                         <div class="form-group">
                             <label for="leave_reason">Leave Reason</label>
-                            <input type="email" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason">
+                            <input type="text" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason">
+                            @if($errors->has('leave_reason'))
+                                <label class="text-danger">{{ $errors->first('leave_reason') }}</label>
+                            @endif
                         </div>
                         <div class="form-group">
-                            <label for="leave_range">Date range:</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="leave_start">Start Date:</label>
 
-                            <div class="input-group">
-                                <div class="input-group-addon">
-                                    <i class="fa fa-calendar"></i>
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control pull-right" id="leave_start" name="leave_start">
+                                    </div>
+                                    @if($errors->has('leave_start'))
+                                        <label class="text-danger">{{ $errors->first('leave_start') }}</label>
+                                    @endif
                                 </div>
-                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range">
+                                <div class="col-md-6">
+                                    <label for="leave_end">End Date:</label>
+
+                                    <div class="input-group date">
+                                        <div class="input-group-addon">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                        <input type="text" class="form-control pull-right" id="leave_end" name="leave_end">
+                                    </div>
+                                    @if($errors->has('leave_end'))
+                                        <label class="text-danger">{{ $errors->first('leave_end') }}</label>
+                                    @endif
+                                </div>
                             </div>
                             <!-- /.input group -->
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Description"></textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Description" name="leave_description"></textarea>
                         </div>
                     </div>
 
@@ -59,7 +87,8 @@
     <script src="{{ asset('AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 
     <script>
-        $('#leave_range').daterangepicker()
+        $('#leave_start').datepicker();
+        $('#leave_end').datepicker();
     </script>
 
 @endsection
