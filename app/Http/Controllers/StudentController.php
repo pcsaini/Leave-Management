@@ -19,7 +19,15 @@ class StudentController extends Controller
         return view('student.add_leave');
     }
 
+    public function addLeave(Request $request){
+        dd($request->all());
+    }
+
     public function getEditLeave(){
         return view('student.edit_leave');
+    }
+
+    public function editLeave(Request $request){
+        dd($request->all());
     }
 }
