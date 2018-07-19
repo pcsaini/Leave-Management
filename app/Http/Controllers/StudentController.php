@@ -24,6 +24,76 @@ class StudentController extends Controller
         return view('student.leave');
     }
 
+    public function getAllLeave(Request $request){
+        $columns  = array(
+            0 => 'id',
+            1 => 'leave_reason',
+            2 => 'leave_to',
+            3 => 'leave_description',
+            4 => 'leave_start',
+            5 => 'leave_end',
+            6 => 'status',
+            7 => 'id'
+        );
+
+        $totalData = StudentLeave::count();
+
+        $totalFiltered = $totalData;
+
+        $limit = $request->input('length');
+        $start = $request->input('start');
+        $order = $columns[$request->input('order.0.column')];
+        $dir = $request->input('order.0.dir');
+
+        if(empty($request->input('search.value'))){
+            $leaves = StudentLeave::offset($start)
+                ->limit($limit)
+                ->orderBy($order,$dir)
+                ->get();
+        } else{
+            $search = $request->input('search.value');
+            $leaves = StudentLeave::where('leave_reason','LIKE','%'.$search.'%')
+                ->orWhere('leave_to','LIKE','%'.$search.'%')
+                ->offset($start)
+                ->limit($limit)
+                ->orderBy($order,$dir)
+                ->get();
+            $totalFiltered = StudentLeave::where('leave_reason','LIKE','%'.$search.'%')
+                ->orWhere('leave_to','LIKE','%'.$search.'%')->count();
+        }
+
+        $data = array();
+
+        if(!empty($leaves))
+        {
+            foreach ($leaves as $leave)
+            {
+                $edit =  route('student.get_edit_leave',$leave->id);
+
+                $nestedData['id'] = $leave->id;
+                $nestedData['leave_reason'] = $leave->leave_reason;
+                $nestedData['leave_to'] = $leave->leave_to;
+                $nestedData['leave_description'] = $leave->leave_description;
+                $nestedData['leave_start'] =date('j M Y h:i a',strtotime($leave->leave_start));
+                $nestedData['leave_end'] = date('j M Y h:i a',strtotime($leave->leave_end));
+                $nestedData['leave_to'] = $leave->leave_to;
+                $nestedData['status'] = $leave->status;
+                $nestedData['options'] = "&emsp;<a href='{$edit}' title='SHOW' ><span class='glyphicon glyphicon-list'></span></a> ";
+                $data[] = $nestedData;
+
+            }
+        }
+
+        $json_data = array(
+            "draw"            => intval($request->input('draw')),
+            "recordsTotal"    => intval($totalData),
+            "recordsFiltered" => intval($totalFiltered),
+            "data"            => $data
+        );
+
+        echo json_encode($json_data);
+    }
+
     public function getAddLeave(){
         $teachers = User::where('role_id',2)->get();
         return view('student.add_leave',['teachers' => $teachers]);
