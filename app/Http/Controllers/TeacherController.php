@@ -189,7 +189,6 @@ class TeacherController extends Controller
             return redirect()->back()->with('error','Leave Not Assign You');
         }
         if ($leave->status == 1){
-            dd($leave);
             return redirect()->back()->with('error','Leave Already Approved');
         }
         $leave->status = 1;

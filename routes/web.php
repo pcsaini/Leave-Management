@@ -22,7 +22,11 @@ Route::get('logout','AuthController@logout')->name('logout');
 Route::prefix('admin')->name('admin.')->middleware('role:1')->group(function (){
     Route::get('/','AdminController@getDashboard')->name('dashboard');
     Route::get('teacher_leave_management','AdminController@getTeacherLeaveManagement')->name('get_teacher_leave_management');
+    Route::post('get_teacher_leave','AdminController@getTeachersAllLeave')->name('teacher_all_leave');
+    Route::get('approve_teacher_leave/{id}','AdminController@approveTeacherLeave')->name('approve_teacher_leave');
     Route::get('student_leave_management','AdminController@getStudentLeaveManagement')->name('get_student_leave_management');
+    Route::post('get_student_leave','AdminController@getStudentsAllLeave')->name('student_all_leave');
+    Route::get('approve_student_leave/{id}','AdminController@approveStudentLeave')->name('approve_student_leave');
     Route::get('teacher_management','AdminController@getTeacherManagement')->name('get_teacher_management');
     Route::get('student_management','AdminController@getStudentManagement')->name('get_student_management');
 });
