@@ -17,7 +17,7 @@ class CreateTeacherLeaveTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->string('leave_reason');
-            $table->string('leave_description');
+            $table->text('leave_description')->nullable();
             $table->date('leave_start');
             $table->date('leave_end');
             $table->tinyInteger('status')->comment('0 - Pending, 1 - Approve')->default(0);

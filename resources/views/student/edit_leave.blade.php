@@ -1,6 +1,6 @@
 @extends('admin.master')
 
-@section('page_title','Student')
+@section('page_title','Student | Edit Leave')
 
 @section('stylesheet')
     <!-- daterange picker -->
@@ -16,39 +16,51 @@
         <div class="col-md-6 col-md-offset-3">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3>Add Leave</h3>
+                    <h3>Edit Leave</h3>
                 </div>
-                <form role="form" method="POST" action="">
+                <form role="form" method="POST" action="{{ route('student.edit_leave',['id' => $leave->id]) }}">
+                    @csrf
+
+                    {{--@if($errors->has('add_leave'))
+                        <label class="text-danger">{{ $errors->first('add_leave') }}</label>
+                    @endif--}}
                     <div class="box-body">
                         <div class="form-group">
                             <label for="leave_reason">Leave Reason</label>
-                            <input type="email" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason">
+                            <input type="text" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason" value="{{ $leave->leave_reason }}">
+                            @if($errors->has('leave_reason'))
+                                <label class="text-danger">{{ $errors->first('leave_reason') }}</label>
+                            @endif
                         </div>
                         <div class="form-group">
                             <label for="leave_to">Leave To</label>
                             <select id="leave_to" class="form-control select2" style="width: 100%;" name="leave_to">
                                 <option selected="selected" disabled>Select Any One</option>
-                                <option value="1">Alaska</option>
-                                <option value="2">California</option>
-                                <option value="3">Delaware</option>
-                                <option value="4">Tennessee</option>
-                                <option value="5">Texas</option>
+                                @foreach($teachers as $teacher)
+                                    <option value="{{ $teacher->id }}" {{ $leave->leave_to == $teacher->id ? 'selected' : ''}}>{{ $teacher->name }}</option>
+                                @endforeach
                             </select>
+                            @if($errors->has('leave_to'))
+                                <label class="text-danger">{{ $errors->first('leave_to') }}</label>
+                            @endif
                         </div>
                         <div class="form-group">
-                            <label for="leave_range">Date range:</label>
+                            <label for="leave_range">Leave Range:</label>
 
                             <div class="input-group">
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range">
+                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range" value="{{ date('m/d/Y',strtotime($leave->leave_start)).' - '.date('m/d/Y',strtotime($leave->leave_end)) }}">
                             </div>
-                            <!-- /.input group -->
+                            @if($errors->has('leave_start') OR $errors->has('leave_end'))
+                                <label class="text-danger">{{ $errors->first('leave_start').','. $errors->first('leave_end')}}</label>
+                        @endif
+                        <!-- /.input group -->
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Description"></textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Description" name="leave_description">{{ $leave->leave_description }}</textarea>
                         </div>
                     </div>
 
@@ -59,6 +71,7 @@
             </div>
         </div>
     </div>
+
 
 @endsection
 

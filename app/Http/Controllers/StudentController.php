@@ -16,11 +16,15 @@ class StudentController extends Controller
 {
     //
     public function getDashboard(){
-        return view('student.dashboard');
+        $user_id = Auth::id();
+        $user = DB::table('users')
+            ->leftJoin('student_details','users.id','=','student_details.user_id')
+            ->where('users.id',$user_id)
+            ->first();
+        return view('student.dashboard',['user' => $user]);
     }
 
     public function getLeaveManagement(){
-
         return view('student.leave');
     }
 
@@ -46,17 +50,23 @@ class StudentController extends Controller
         $dir = $request->input('order.0.dir');
 
         if(empty($request->input('search.value'))){
-            $leaves = StudentLeave::offset($start)
+            $leaves = DB::table('student_leave')
+                ->leftJoin('users','student_leave.leave_to', '=', 'users.id')
+                ->select('student_leave.*','users.name')
+                ->offset($start)
                 ->limit($limit)
-                ->orderBy($order,$dir)
+                ->orderBy('student_leave.'.$order,$dir)
                 ->get();
         } else{
             $search = $request->input('search.value');
-            $leaves = StudentLeave::where('leave_reason','LIKE','%'.$search.'%')
+            $leaves = DB::table('student_leave')
+                ->leftJoin('users','student_leave.leave_to', '=', 'users.id')
+                ->select('student_leave.*','users.name')
+                ->where('leave_reason','LIKE','%'.$search.'%')
                 ->orWhere('leave_to','LIKE','%'.$search.'%')
                 ->offset($start)
                 ->limit($limit)
-                ->orderBy($order,$dir)
+                ->orderBy('student_leave.'.$order,$dir)
                 ->get();
             $totalFiltered = StudentLeave::where('leave_reason','LIKE','%'.$search.'%')
                 ->orWhere('leave_to','LIKE','%'.$search.'%')->count();
@@ -69,16 +79,15 @@ class StudentController extends Controller
             foreach ($leaves as $leave)
             {
                 $edit =  route('student.get_edit_leave',$leave->id);
-
+                $delete = route('student.delete_leave',$leave->id);
                 $nestedData['id'] = $leave->id;
                 $nestedData['leave_reason'] = $leave->leave_reason;
-                $nestedData['leave_to'] = $leave->leave_to;
-                $nestedData['leave_description'] = $leave->leave_description;
-                $nestedData['leave_start'] =date('j M Y h:i a',strtotime($leave->leave_start));
-                $nestedData['leave_end'] = date('j M Y h:i a',strtotime($leave->leave_end));
-                $nestedData['leave_to'] = $leave->leave_to;
-                $nestedData['status'] = $leave->status;
-                $nestedData['options'] = "&emsp;<a href='{$edit}' title='SHOW' ><span class='glyphicon glyphicon-list'></span></a> ";
+                $nestedData['leave_to'] = $leave->name;
+                $nestedData['leave_description'] = str_limit($leave->leave_description,20);
+                $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
+                $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['status'] = $leave->status == 0 ? "<span class='text-red'><b>Pending</b></span>" : "<span class='text-green'><b>Approved</b></span>";
+                $nestedData['options'] = $leave->status == 0 ? "<a href='{$edit}' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='{$delete}' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>" : " ";
                 $data[] = $nestedData;
 
             }
@@ -101,6 +110,9 @@ class StudentController extends Controller
 
     public function addLeave(Request $request){
         $user = Auth::user();
+        $leave_date = explode('-',$request->input('leave_range'));
+        $request->request->add(['leave_start' => $leave_date[0]]);
+        $request->request->add(['leave_end' => $leave_date[1]]);
         $validator = Validator::make($request->all(),[
             'leave_reason' => 'required|max:20',
             'leave_to' => 'required|exists:users,id',
@@ -110,13 +122,12 @@ class StudentController extends Controller
         if ($validator->fails()){
             return redirect()->back()->withErrors($validator->errors());
         }
-
         $leave = new StudentLeave();
         $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
         $leave->leave_to = $request->input('leave_to');
-        $leave->leave_start = Carbon::createFromFormat('m/d/Y',$request->input('leave_start'))->toDateString();
-        $leave->leave_end = Carbon::createFromFormat('m/d/Y',$request->input('leave_end'))->toDateString();
+        $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
+        $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
         $leave->leave_description = $request->input('leave_description');
 
         $result = $leave->save();
@@ -127,11 +138,58 @@ class StudentController extends Controller
         return redirect()->route('student.get_leave_management')->with('success','Leave Created Successfully');
     }
 
-    public function getEditLeave(){
-        return view('student.edit_leave');
+    public function getEditLeave($id){
+        $leave = StudentLeave::find($id);
+        $teachers = User::where('role_id',2)->get();
+        return view('student.edit_leave',['leave' => $leave,'teachers' => $teachers]);
     }
 
-    public function editLeave(Request $request){
-        dd($request->all());
+    public function editLeave(Request $request,$id){
+        $user = Auth::user();
+        $leave_date = explode('-',$request->input('leave_range'));
+        $request->request->add(['leave_start' => $leave_date[0]]);
+        $request->request->add(['leave_end' => $leave_date[1]]);
+        $validator = Validator::make($request->all(),[
+            'leave_reason' => 'required|max:20',
+            'leave_to' => 'required|exists:users,id',
+            'leave_start' => 'required|date|after:today',
+            'leave_end' => 'required|date|after:leave_start'
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors());
+        }
+        $leave = StudentLeave::find($id);
+        $leave->user_id = $user->id;
+        $leave->leave_reason = $request->input('leave_reason');
+        $leave->leave_to = $request->input('leave_to');
+        $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
+        $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
+        $leave->leave_description = $request->input('leave_description');
+
+        $result = $leave->save();
+        if (!$result){
+            $errors = array(['add_leave' => 'Problem to Create Leave']);
+            return redirect()->back()->withErrors($errors);
+        }
+        return redirect()->route('student.get_leave_management')->with('success','Leave Edit Successfully');
+    }
+
+    public function deleteLeave($id){
+        $leave = StudentLeave::find($id);
+        if (!$leave){
+            $errors = array(['delete_leave' => 'Leave Not Found']);
+            return redirect()->back()->withErrors($errors);
+        }
+        if ($leave->status == 1){
+            $errors = array(['delete_leave' => 'Leave Can\'t Delete']);
+            return redirect()->back()->withErrors($errors);
+        }
+        $result = $leave->delete();
+        if (!$result){
+            $errors = array(['delete_leave' => 'Problem to Delete Leave']);
+            return redirect()->back()->withErrors($errors);
+        }
+
+        return redirect()->back()->with('success','Leave Delete Successfully');
     }
 }

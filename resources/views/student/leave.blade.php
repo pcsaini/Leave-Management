@@ -37,6 +37,18 @@
                             <th>Option</th>
                         </tr>
                         </thead>
+                        <tfoot>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Leave Reason</th>
+                            <th>Leave To</th>
+                            <th>Leave Description</th>
+                            <th>Leave Start</th>
+                            <th>Leave End</th>
+                            <th>Status</th>
+                            <th>Option</th>
+                        </tr>
+                        </tfoot>
                     </table>
                 </div>
                 <!-- /.box-body -->
