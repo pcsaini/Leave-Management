@@ -17,9 +17,9 @@
                 </div>
             @endif
 
-            @if($errors->has('delete_leave'))
+            @if(session('error'))
                 <div class="alert alert-danger alert-dismissable">
-                    {{ $errors->first('delete_leave') }}
+                    {{ session('error') }}
                 </div>
             @endif
 

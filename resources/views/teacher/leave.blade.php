@@ -17,10 +17,10 @@
                 </div>
             @endif
 
-            @if($errors->has('delete_leave'))
-                    <div class="alert alert-danger alert-dismissable">
-                        {{ $errors->first('delete_leave') }}
-                    </div>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissable">
+                    {{ session('error') }}
+                </div>
             @endif
 
             <div class="box">

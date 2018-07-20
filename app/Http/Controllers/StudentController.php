@@ -29,6 +29,7 @@ class StudentController extends Controller
     }
 
     public function getAllLeave(Request $request){
+        $user_id = Auth::id();
         $columns  = array(
             0 => 'id',
             1 => 'leave_reason',
@@ -40,7 +41,7 @@ class StudentController extends Controller
             7 => 'id'
         );
 
-        $totalData = StudentLeave::count();
+        $totalData = StudentLeave::where('user_id',$user_id)->count();
 
         $totalFiltered = $totalData;
 
@@ -53,6 +54,7 @@ class StudentController extends Controller
             $leaves = DB::table('student_leave')
                 ->leftJoin('users','student_leave.leave_to', '=', 'users.id')
                 ->select('student_leave.*','users.name')
+                ->where('user_id',$user_id)
                 ->offset($start)
                 ->limit($limit)
                 ->orderBy('student_leave.'.$order,$dir)
@@ -62,6 +64,7 @@ class StudentController extends Controller
             $leaves = DB::table('student_leave')
                 ->leftJoin('users','student_leave.leave_to', '=', 'users.id')
                 ->select('student_leave.*','users.name')
+                ->where('user_id',$user_id)
                 ->where('leave_reason','LIKE','%'.$search.'%')
                 ->orWhere('leave_to','LIKE','%'.$search.'%')
                 ->offset($start)
@@ -69,7 +72,9 @@ class StudentController extends Controller
                 ->orderBy('student_leave.'.$order,$dir)
                 ->get();
             $totalFiltered = StudentLeave::where('leave_reason','LIKE','%'.$search.'%')
-                ->orWhere('leave_to','LIKE','%'.$search.'%')->count();
+                ->orWhere('leave_to','LIKE','%'.$search.'%')
+                ->where('user_id',$user_id)
+                ->count();
         }
 
         $data = array();
@@ -177,17 +182,14 @@ class StudentController extends Controller
     public function deleteLeave($id){
         $leave = StudentLeave::find($id);
         if (!$leave){
-            $errors = array(['delete_leave' => 'Leave Not Found']);
-            return redirect()->back()->withErrors($errors);
+            return redirect()->back()->with('error','Leave Not Found');
         }
         if ($leave->status == 1){
-            $errors = array(['delete_leave' => 'Leave Can\'t Delete']);
-            return redirect()->back()->withErrors($errors);
+            return redirect()->back()->with('error','Leave Can\'t Delete');
         }
         $result = $leave->delete();
         if (!$result){
-            $errors = array(['delete_leave' => 'Problem to Delete Leave']);
-            return redirect()->back()->withErrors($errors);
+            return redirect()->back()->with('error','Problem to Delete Leave');
         }
 
         return redirect()->back()->with('success','Leave Delete Successfully');
