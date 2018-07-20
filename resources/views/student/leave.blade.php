@@ -17,9 +17,15 @@
                 </div>
             @endif
 
+            @if($errors->has('delete_leave'))
+                <div class="alert alert-danger alert-dismissable">
+                    {{ $errors->first('delete_leave') }}
+                </div>
+            @endif
+
             <div class="box">
                 <div class="box-header">
-                    <h3 class="box-title">Data Table With Full Features</h3>
+                    <h3 class="box-title">Leave Management</h3>
                     <a href="{{ route('student.get_add_leave') }}" class="btn btn-primary pull-right">Add Leave</a>
                 </div>
                 <!-- /.box-header -->

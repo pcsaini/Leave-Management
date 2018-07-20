@@ -33,35 +33,18 @@
                             @endif
                         </div>
                         <div class="form-group">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="leave_start">Start Date:</label>
+                            <label for="leave_range">Leave Range:</label>
 
-                                    <div class="input-group date">
-                                        <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                        </div>
-                                        <input type="text" class="form-control pull-right" id="leave_start" name="leave_start">
-                                    </div>
-                                    @if($errors->has('leave_start'))
-                                        <label class="text-danger">{{ $errors->first('leave_start') }}</label>
-                                    @endif
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
                                 </div>
-                                <div class="col-md-6">
-                                    <label for="leave_end">End Date:</label>
-
-                                    <div class="input-group date">
-                                        <div class="input-group-addon">
-                                            <i class="fa fa-calendar"></i>
-                                        </div>
-                                        <input type="text" class="form-control pull-right" id="leave_end" name="leave_end">
-                                    </div>
-                                    @if($errors->has('leave_end'))
-                                        <label class="text-danger">{{ $errors->first('leave_end') }}</label>
-                                    @endif
-                                </div>
+                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range">
                             </div>
-                            <!-- /.input group -->
+                            @if($errors->has('leave_start') OR $errors->has('leave_end'))
+                                <label class="text-danger">{{ $errors->first('leave_start').','. $errors->first('leave_end')}}</label>
+                        @endif
+                        <!-- /.input group -->
                         </div>
                         <div class="form-group">
                             <label>Description</label>
@@ -87,8 +70,7 @@
     <script src="{{ asset('AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
 
     <script>
-        $('#leave_start').datepicker();
-        $('#leave_end').datepicker();
+        $('#leave_range').daterangepicker();
     </script>
 
 @endsection

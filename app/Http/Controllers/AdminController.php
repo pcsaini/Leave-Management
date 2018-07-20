@@ -10,7 +10,7 @@ class AdminController extends Controller
     //
     public function getDashboard(){
         $user = Auth::user();
-        return view('admin.dashboard');
+        return view('admin.dashboard',['user' => $user]);
     }
 
     public function getTeacherLeaveManagement(){

@@ -30,11 +30,13 @@ Route::prefix('admin')->name('admin.')->middleware('role:1')->group(function (){
 Route::prefix('teacher')->name('teacher.')->middleware('role:2')->group(function (){
     Route::get('/','TeacherController@getDashboard')->name('dashboard');
     Route::get('leave_management','TeacherController@getLeaveManagement')->name('get_leave_management');
+    Route::POST('get_all_leave','TeacherController@getAllLeave')->name('get_all_leave');
     Route::get('student_leave_management','TeacherController@getStudentLeaveManagement')->name('get_student_leave_management');
     Route::get('leave','TeacherController@getAddLeave')->name('get_add_leave');
     Route::POST('leave','TeacherController@addLeave')->name('add_leave');
     Route::get('leave/{id}','TeacherController@getEditLeave')->name('get_edit_leave');
     Route::POST('leave/{id}','TeacherController@editLeave')->name('edit_leave');
+    Route::get('delete_leave/{id}','TeacherController@deleteLeave')->name('delete_leave');
 
 });
 
