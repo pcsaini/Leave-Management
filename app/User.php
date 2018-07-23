@@ -32,6 +32,18 @@ class User extends Authenticatable
         return $this->hasOne(Teacher::class,'user_id');
     }
 
+    public function student(){
+        return $this->hasOne(Student::class,'user_id');
+    }
+
+    public function teacher_leaves(){
+        return $this->hasMany(TeacherLeave::class,'user_id','id');
+    }
+
+    public function student_leaves(){
+        return $this->hasMany(StudentLeave::class,'user_id','id');
+    }
+
     public function sandwich_leave($start,$end){
         if ($start->isSaturday()){
             if ($end->isSaturday()){
