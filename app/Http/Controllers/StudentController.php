@@ -37,8 +37,9 @@ class StudentController extends Controller
             3 => 'leave_description',
             4 => 'leave_start',
             5 => 'leave_end',
-            6 => 'status',
-            7 => 'id'
+            6 => 'leave_days',
+            7 => 'status',
+            8 => 'id'
         );
 
         $totalData = StudentLeave::where('user_id',$user_id)->count();
@@ -91,6 +92,7 @@ class StudentController extends Controller
                 $nestedData['leave_description'] = str_limit($leave->leave_description,20);
                 $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
                 $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['leave_days'] = $leave->leave_days;
                 $nestedData['status'] = $leave->status == 0 ? "<span class='text-red'><b>Pending</b></span>" : "<span class='text-green'><b>Approved</b></span>";
                 $nestedData['options'] = $leave->status == 0 ? "<a href='{$edit}' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='{$delete}' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>" : " ";
                 $data[] = $nestedData;
@@ -121,18 +123,25 @@ class StudentController extends Controller
         $validator = Validator::make($request->all(),[
             'leave_reason' => 'required|max:20',
             'leave_to' => 'required|exists:users,id',
-            'leave_start' => 'required|date|after:today',
-            'leave_end' => 'required|date|after:leave_start'
+            'leave_start' => 'required|date',
+            'leave_end' => 'required|date'
         ]);
         if ($validator->fails()){
             return redirect()->back()->withErrors($validator->errors());
         }
+        $leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')));
+        $leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')));
+
+        $userModel = new User();
+        $days = $userModel->sandwich_leave($leave_start,$leave_end);
+
         $leave = new StudentLeave();
         $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
         $leave->leave_to = $request->input('leave_to');
-        $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
-        $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
+        $leave->leave_start = $leave_start->toDateString();
+        $leave->leave_end = $leave_end->toDateString();
+        $leave->leave_days = $days;
         $leave->leave_description = $request->input('leave_description');
 
         $result = $leave->save();

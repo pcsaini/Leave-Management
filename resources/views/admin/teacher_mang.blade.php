@@ -28,7 +28,7 @@
             <div class="box">
                 <div class="box-header">
                     <h3 class="box-title">Teacher Management</h3>
-                    <a href="{{ route('get_ass_teacher') }}" class="btn btn-primary pull-right">Add Teacher</a>
+                    <a href="{{ route('admin.get_add_teacher') }}" class="btn btn-primary pull-right">Add Teacher</a>
                 </div>
                 <!-- /.box-header -->
                 <div class="box-body">

@@ -30,7 +30,8 @@ class AdminController extends Controller
             2 => 'leave_description',
             3 => 'leave_start',
             4 => 'leave_end',
-            5 => 'status',
+            5 => 'leave_days',
+            6 => 'status',
         );
 
         $totalData = TeacherLeave::count();
@@ -76,6 +77,7 @@ class AdminController extends Controller
                 $nestedData['leave_description'] = str_limit($leave->leave_description,20);
                 $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
                 $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['leave_days'] = $leave->leave_days;
                 $nestedData['status'] = $leave->status == 0 ? "<a href='{$approve}' class='btn btn-primary'>Approve</a>" : "<span class='text-green'><b>Approved</b></span>";
                 $data[] = $nestedData;
 
@@ -123,7 +125,8 @@ class AdminController extends Controller
             4 => 'leave_description',
             5 => 'leave_start',
             6 => 'leave_end',
-            7 => 'status'
+            7 => 'leave_days',
+            8 => 'status'
         );
 
         $totalData = StudentLeave::count();
@@ -173,6 +176,7 @@ class AdminController extends Controller
                 $nestedData['leave_description'] = str_limit($leave->leave_description,20);
                 $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
                 $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['leave_days'] = $leave->leave_days;
                 $nestedData['status'] = $leave->status == 0 ? "<a href='{$approve}' class='btn btn-primary'>Approve</a>" : "<span class='text-green'><b>Approved</b></span>";
                 $data[] = $nestedData;
 

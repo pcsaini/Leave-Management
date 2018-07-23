@@ -20,6 +20,7 @@ class CreateTeacherLeaveTable extends Migration
             $table->text('leave_description')->nullable();
             $table->date('leave_start');
             $table->date('leave_end');
+            $table->integer('leave_days');
             $table->tinyInteger('status')->comment('0 - Pending, 1 - Approve')->default(0);
             $table->timestamps();
 

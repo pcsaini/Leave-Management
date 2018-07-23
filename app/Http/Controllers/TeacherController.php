@@ -34,8 +34,9 @@ class TeacherController extends Controller
             2 => 'leave_description',
             3 => 'leave_start',
             4 => 'leave_end',
-            5 => 'status',
-            6 => 'id'
+            5 => 'leave_days',
+            6 => 'status',
+            7 => 'id'
         );
 
         $totalData = TeacherLeave::where('user_id',$user_id)->count();
@@ -80,6 +81,7 @@ class TeacherController extends Controller
                 $nestedData['leave_description'] = str_limit($leave->leave_description,20);
                 $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
                 $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['leave_days'] = $leave->leave_days;
                 $nestedData['status'] = $leave->status == 0 ? "<span class='text-red'><b>Pending</b></span>" : "<span class='text-green'><b>Approved</b></span>";
                 $nestedData['options'] = $leave->status == 0 ? "<a href='{$edit}' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='{$delete}' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>" : " ";
                 $data[] = $nestedData;
@@ -110,8 +112,9 @@ class TeacherController extends Controller
             3 => 'leave_description',
             4 => 'leave_start',
             5 => 'leave_end',
-            6 => 'status',
-            7 => 'id'
+            6 => 'leave_days',
+            7 => 'status',
+            8 => 'id'
         );
 
         $totalData = StudentLeave::where('leave_to',$user->id)
@@ -162,6 +165,7 @@ class TeacherController extends Controller
                 $nestedData['leave_description'] = str_limit($leave->leave_description,20);
                 $nestedData['leave_start'] =date('j M Y',strtotime($leave->leave_start));
                 $nestedData['leave_end'] = date('j M Y',strtotime($leave->leave_end));
+                $nestedData['leave_days'] = $leave->leave_days;
                 $nestedData['status'] = $leave->status == 0 ? "<a href='{$approve}' class='btn btn-primary'>Approve</a>" : "<span class='text-green'><b>Approved</b></span>";
                 $data[] = $nestedData;
 
@@ -218,11 +222,18 @@ class TeacherController extends Controller
             return redirect()->back()->withErrors($validator->errors());
         }
 
+        $leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')));
+        $leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')));
+
+        $userModel = new User();
+        $days = $userModel->sandwich_leave($leave_start,$leave_end);
+
         $leave = new TeacherLeave();
         $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
-        $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
-        $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
+        $leave->leave_start = $leave_start->toDateString();
+        $leave->leave_end = $leave_end->toDateString();
+        $leave->leave_days = $days;
         $leave->leave_description = $request->input('leave_description');
 
         $result = $leave->save();

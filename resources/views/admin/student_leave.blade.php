@@ -41,6 +41,7 @@
                             <th>Leave Description</th>
                             <th>Leave Start</th>
                             <th>Leave End</th>
+                            <th>Leave Days</th>
                             <th>Status</th>
                         </tr>
                         </thead>
@@ -53,6 +54,7 @@
                             <th>Leave Description</th>
                             <th>Leave Start</th>
                             <th>Leave End</th>
+                            <th>Leave Days</th>
                             <th>Status</th>
                         </tr>
                         </tfoot>
@@ -91,6 +93,7 @@
                     { "data": "leave_description" },
                     { "data": "leave_start" },
                     { "data": "leave_end" },
+                    { "data": "leave_days"},
                     { "data": "status" },
                 ]
             })
