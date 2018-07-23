@@ -16,10 +16,10 @@ class CreateStudentDetailsTable extends Migration
         Schema::create('student_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('class');
+            $table->string('class')->nullable();
             $table->string('father_name');
-            $table->bigInteger('contact_no');
-            $table->string('address');
+            $table->bigInteger('contact_no')->nullable();
+            $table->string('address')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

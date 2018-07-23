@@ -16,9 +16,9 @@ class CreateTeacherDetailsTable extends Migration
         Schema::create('teacher_details', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('subject');
-            $table->bigInteger('contact_no');
-            $table->string('address');
+            $table->string('subject')->nullable();
+            $table->bigInteger('contact_no')->nullable();
+            $table->string('address')->nullable();
 
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

@@ -68,3 +68,5 @@ Route::prefix('student')->name('student.')->middleware('role:3')->group(function
     Route::post('leave/{id}','StudentController@editLeave')->name('edit_leave');
     Route::get('delete_leave/{id}','StudentController@deleteLeave')->name('delete_leave');
 });
+
+Route::get('ip','AdminController@ip');

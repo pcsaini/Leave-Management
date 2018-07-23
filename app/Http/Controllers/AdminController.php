@@ -10,6 +10,8 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Stevebauman\Location\Facades\Location;
 
 class AdminController extends Controller
 {
@@ -263,12 +265,14 @@ class AdminController extends Controller
         {
             foreach ($users as $user)
             {
+                $edit = route('admin.get_edit_teacher',$user->user_id);
+                $delete = route('admin.delete_teacher',$user->user_id);
                 $nestedData['id'] = $user->id;
                 $nestedData['name'] = $user->name;
                 $nestedData['email'] = $user->email;
                 $nestedData['contact_no'] = $user->contact_no;
                 $nestedData['address'] = $user->address;
-                $nestedData['options'] = "<a href='#' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='#' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>";
+                $nestedData['options'] = "<a href='{$edit}' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='{$delete}' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>";
                 $data[] = $nestedData;
 
             }
@@ -289,11 +293,45 @@ class AdminController extends Controller
     }
 
     public function addTeacher(Request $request){
-        dd($request->all());
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'email' => 'email|unique:users,email',
+            'password' => 'min:6|max:16',
+            'contact_no' => 'min:8|max:13',
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = new User();
+        $user->email = $request->input('email');
+        $user->name = $request->input('name');
+        $user->password = bcrypt($request->input('password'));
+        $user->role_id = 2;
+        $user->save();
+
+        $teacher = new Teacher();
+        $teacher->user_id = $user->id;
+        $teacher->contact_no = $request->input('contact_no');
+        $teacher->address = $request->input('address');
+        $teacher = $teacher->save();
+
+        if (!$teacher){
+            return redirect()->back()->with('error','Problem to Create Teacher');
+        }
+
+        return redirect()->route('admin.get_teacher_management')->with('success' , 'Teacher Add Successfully');
+
+
     }
 
     public function getEditTeacher($id){
-        return view('admin.edit_teacher');
+        $teacher = DB::table('users')
+            ->leftJoin('teacher_details','teacher_details.user_id','=','users.id')
+            ->where('users.id',$id)
+            ->first();
+
+        return view('admin.edit_teacher',['teacher' => $teacher]);
     }
 
     public function editTeacher(Request $request, $id){
@@ -301,7 +339,18 @@ class AdminController extends Controller
     }
 
     public function deleteTeacher($id){
-        dd(($id));
+        $user = User::find($id);
+        if (!$user){
+            return redirect()->back()->with('error','User Not Found');
+        }
+        $teacherDetails = Teacher::where('user_id',$id)->first();
+        if (!$teacherDetails){
+            return redirect()->back()->with('error','Student Details Not Found');
+        }
+        $teacherDetails->delete();
+        $user->delete();
+
+        return redirect()->back()->with('success', 'user Delete Successfully');
     }
 
     public function getStudentManagement(){
@@ -362,6 +411,8 @@ class AdminController extends Controller
         {
             foreach ($users as $user)
             {
+                $edit = route('admin.get_edit_student',$user->user_id);
+                $delete = route('admin.delete_student',$user->user_id);
                 $nestedData['id'] = $user->id;
                 $nestedData['name'] = $user->name;
                 $nestedData['father_name'] = $user->father_name;
@@ -369,7 +420,7 @@ class AdminController extends Controller
                 $nestedData['contact_no'] = $user->contact_no;
                 $nestedData['class'] =  $user->class;
                 $nestedData['address'] = $user->address;
-                $nestedData['options'] = "<a href='#' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='#' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>";
+                $nestedData['options'] = "<a href='{$edit}' title='Edit' ><span class='glyphicon glyphicon-edit text-primary'></span></a> &nbsp; <a href='{$delete}' title='Delete' ><span class='glyphicon glyphicon-trash text-red'></span></a>";
                 $data[] = $nestedData;
 
             }
@@ -390,18 +441,66 @@ class AdminController extends Controller
     }
 
     public function addStudent(Request $request){
-        dd($request->all());
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'father_name' => 'required|max:20',
+            'email' => 'email|unique:users,email',
+            'password' => 'min:6|max:16',
+            'contact_no' => 'min:8|max:13',
+        ]);
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = new User();
+        $user->email = $request->input('email');
+        $user->name = $request->input('name');
+        $user->password = bcrypt($request->input('password'));
+        $user->role_id = 3;
+        $user->save();
+
+        $student = new Student();
+        $student->user_id = $user->id;
+        $student->class = $request->input('class');
+        $student->father_name = $request->input('father_name');
+        $student->contact_no = $request->input('contact_no');
+        $student->address = $request->input('address');
+        $student = $student->save();
+
+        if (!$student){
+            return redirect()->back()->with('error','Problem to Create Student');
+        }
+
+        return redirect()->route('admin.get_student_management')->with('success' , 'Student Add Successfully');
+
     }
 
     public function getEditStudent($id){
-        return view('admin.edit_student');
+        $student = DB::table('users')
+            ->leftJoin('student_details','student_details.user_id','=','users.id')
+            ->where('users.id',$id)
+            ->first();
+
+        return view('admin.edit_student',['student' => $student]);
     }
 
     public function editStudent(Request $request, $id){
-        dd($request->all());
+
+
     }
 
     public function deleteStudent($id){
-        dd($id);
+        $user = User::find($id);
+        if (!$user){
+            return redirect()->back()->with('error','User Not Found');
+        }
+        $studentDetails = Student::where('user_id',$id)->first();
+        if (!$studentDetails){
+            return redirect()->back()->with('error','Student Details Not Found');
+        }
+        $studentDetails->delete();
+        $user->delete();
+
+        return redirect()->back()->with('success', 'user Delete Successfully');
     }
 }

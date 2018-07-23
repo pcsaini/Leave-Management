@@ -2,27 +2,19 @@
 
 @section('page_title','Admin | Add Student')
 
-@section('stylesheet')
-    <!-- daterange picker -->
-    <link rel="stylesheet" href="{{ asset('AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.css') }}">
-    <!-- bootstrap datepicker -->
-    <link rel="stylesheet" href="{{ asset('AdminLTE/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css') }}">
-
-@endsection
-
 @section('content')
 
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
             <div class="box box-primary">
                 <div class="box-header with-border">
-                    <h3>Add Stduent</h3>
+                    <h3>Add Student</h3>
                 </div>
                 <form role="form" method="POST" action="{{ route('admin.add_student') }}">
                     @csrf
 
-                    @if($errors->has('add_leave'))
-                        <label class="text-danger">{{ $errors->first('add_leave') }}</label>
+                    @if(session('error'))
+                        <label class="text-danger">{{ session('error') }}</label>
                     @endif
                     <div class="box-body">
                         <div class="form-group">
@@ -76,24 +68,10 @@
                     <div class="box-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-
-@endsection
-
-@section('script')
-    <!-- date-range-picker -->
-    <script src="{{ asset('AdminLTE/bower_components/moment/min/moment.min.js') }}"></script>
-    <script src="{{ asset('AdminLTE/bower_components/bootstrap-daterangepicker/daterangepicker.js') }}"></script>
-    <!-- bootstrap datepicker -->
-    <script src="{{ asset('AdminLTE/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js') }}"></script>
-
-    <script>
-        $('#leave_start').datepicker();
-        $('#leave_end').datepicker();
-        $('#leave_range').daterangepicker();
-    </script>
 
 @endsection

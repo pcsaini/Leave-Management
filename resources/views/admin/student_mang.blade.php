@@ -17,8 +17,6 @@
                 </div>
             @endif
 
-
-
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissable">
                     {{ session('error') }}
