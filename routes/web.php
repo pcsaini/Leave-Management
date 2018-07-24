@@ -45,6 +45,8 @@ Route::prefix('admin')->name('admin.')->middleware('role:1')->group(function (){
 
 Route::prefix('teacher')->name('teacher.')->middleware('role:2')->group(function (){
     Route::get('/','TeacherController@getDashboard')->name('dashboard');
+    Route::get('profile','TeacherController@getEditProfile')->name('get_edit_profile');
+    Route::post('profile','TeacherController@editProfile')->name('edit_profile');
     Route::get('leave_management','TeacherController@getLeaveManagement')->name('get_leave_management');
     Route::post('get_all_leave','TeacherController@getAllLeave')->name('get_all_leave');
     Route::get('student_leave_management','TeacherController@getStudentLeaveManagement')->name('get_student_leave_management');
@@ -60,6 +62,8 @@ Route::prefix('teacher')->name('teacher.')->middleware('role:2')->group(function
 
 Route::prefix('student')->name('student.')->middleware('role:3')->group(function (){
     Route::get('/','StudentController@getDashboard')->name('dashboard');
+    Route::get('profile','StudentController@getEditProfile')->name('get_edit_profile');
+    Route::post('profile','StudentController@editProfile')->name('edit_profile');
     Route::get('leave_management','StudentController@getLeaveManagement')->name('get_leave_management');
     Route::post('all_leave','StudentController@getAllLeave')->name('get_all_leave');
     Route::get('leave','StudentController@getAddLeave')->name('get_add_leave');

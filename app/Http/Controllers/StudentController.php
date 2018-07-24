@@ -23,6 +23,40 @@ class StudentController extends Controller
         return view('student.dashboard',['user' => $user]);
     }
 
+    public function getEditProfile(){
+        $user_id = Auth::id();
+        $student = DB::table('users')
+            ->leftJoin('student_details','student_details.user_id','=','users.id')
+            ->where('users.id',$user_id)
+            ->first();
+        return view('student.edit_profile',['student' => $student]);
+    }
+
+    public function editProfile(Request $request){
+        $user_id = Auth::id();
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'father_name' => 'required|max:20',
+            'contact_no' => 'min:8|max:13',
+        ]);
+
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = User::find($user_id);
+        $user->name = $request->input('name');
+        $student= $user->student;
+        $student->father_name = $request->input('father_name');
+        $student->class = $request->input('class');
+        $student->contact_no = $request->input('contact_no');
+        $student->address = $request->input('address');
+        $student->update();
+        $user->update();
+
+        return redirect()->route('student.dashboard')->with('success' , 'Student Edit Successfully');
+    }
+
     public function getLeaveManagement(){
         return view('student.leave');
     }

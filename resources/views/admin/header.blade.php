@@ -150,6 +150,18 @@
                         </li>--}}
                         <!-- Menu Footer-->
                         <li class="user-footer">
+                            @if(Auth::user()->role_id == 2)
+                                <div class="pull-left">
+                                    <a href="{{ route('teacher.get_edit_profile') }}" class="btn btn-default btn-flat">Edit Profile</a>
+                                </div>
+
+                            @elseif(Auth::user()->role_id == 3)
+                                <div class="pull-left">
+                                    <a href="{{ route('student.get_edit_profile') }}" class="btn btn-default btn-flat">Edit Profile</a>
+                                </div>
+
+                            @endif
+
                             <div class="pull-right">
                                 <a href="{{ route('logout') }}" class="btn btn-default btn-flat">Sign out</a>
                             </div>

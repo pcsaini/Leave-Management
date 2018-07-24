@@ -23,6 +23,37 @@ class TeacherController extends Controller
         return view('teacher.dashboard',['user' => $user]);
     }
 
+    public function getEditProfile(){
+        $user_id = Auth::id();
+        $teacher = DB::table('users')
+            ->leftJoin('teacher_details','teacher_details.user_id','=','users.id')
+            ->where('users.id',$user_id)
+            ->first();
+        return view('teacher.edit_profile',['teacher' => $teacher]);
+    }
+
+    public function editProfile(Request $request){
+        $user_id = Auth::id();
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'contact_no' => 'min:8|max:13',
+        ]);
+
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = User::find($user_id);
+        $user->name = $request->input('name');
+        $teacher = $user->teacher;
+        $teacher->contact_no = $request->input('contact_no');
+        $teacher->address = $request->input('address');
+        $teacher->update();
+        $user->update();
+
+        return redirect()->route('teacher.dashboard')->with('success' , 'Teacher Edit Successfully');
+    }
+
     public function getLeaveManagement(){
         return view('teacher.leave');
     }

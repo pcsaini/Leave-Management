@@ -5,6 +5,13 @@
 @section('content')
 
     <div class="row">
+
+        <div class="col-md-12">
+            @if(session('success'))
+                <label class="text-danger">{{ session('success') }}</label>
+            @endif
+        </div>
+
         <div class="col-md-offset-4 col-md-4">
 
             <!-- Profile Image -->

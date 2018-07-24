@@ -325,11 +325,7 @@ class AdminController extends Controller
     }
 
     public function getEditTeacher($id){
-       /* $user = User::find($id);
-        $teacher = $user->teacher;
-
-        return response()->json($teacher);*/
-        $teacher = DB::table('users')
+       $teacher = DB::table('users')
             ->leftJoin('teacher_details','teacher_details.user_id','=','users.id')
             ->where('users.id',$id)
             ->first();
