@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\StudentLeave;
 use App\TeacherLeave;
+use App\User;
 use Illuminate\Http\Request;
 use Auth;
 use Illuminate\Support\Carbon;
@@ -215,8 +216,8 @@ class TeacherController extends Controller
         $request->request->add(['leave_end' => $leave_date[1]]);
         $validator = Validator::make($request->all(),[
             'leave_reason' => 'required|max:20',
-            'leave_start' => 'required|date|after:today',
-            'leave_end' => 'required|date|after:leave_start'
+            'leave_start' => 'required|date',
+            'leave_end' => 'required|date'
         ]);
         if ($validator->fails()){
             return redirect()->back()->withErrors($validator->errors());
@@ -257,8 +258,8 @@ class TeacherController extends Controller
         $request->request->add(['leave_end' => $leave_date[1]]);
         $validator = Validator::make($request->all(),[
             'leave_reason' => 'required|max:20',
-            'leave_start' => 'required|date|after:today',
-            'leave_end' => 'required|date|after:leave_start'
+            'leave_start' => 'required|date',
+            'leave_end' => 'required|date'
         ]);
         if ($validator->fails()){
             return redirect()->back()->withErrors($validator->errors());
@@ -270,7 +271,8 @@ class TeacherController extends Controller
         $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
         $leave->leave_description = $request->input('leave_description');
 
-        $result = $leave->save();
+        $user = User::find($user->id);
+        $result = $user->teacher_leaves()->save($leave);
         if (!$result){
             $errors = array(['add_leave' => 'Problem to Create Leave']);
             return redirect()->back()->withErrors($errors);

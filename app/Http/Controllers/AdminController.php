@@ -338,7 +338,24 @@ class AdminController extends Controller
     }
 
     public function editTeacher(Request $request, $id){
-        dd($request->all());
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'contact_no' => 'min:8|max:13',
+        ]);
+
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = User::find($id);
+        $user->name = $request->input('name');
+        $teacher = $user->teacher;
+        $teacher->contact_no = $request->input('contact_no');
+        $teacher->address = $request->input('address');
+        $teacher->update();
+        $user->update();
+
+        return redirect()->route('admin.get_teacher_management')->with('success' , 'Teacher Edit Successfully');
     }
 
     public function deleteTeacher($id){
@@ -487,7 +504,27 @@ class AdminController extends Controller
     }
 
     public function editStudent(Request $request, $id){
+        $validator = Validator::make($request->all(),[
+            'name' => 'required|max:20',
+            'father_name' => 'required|max:20',
+            'contact_no' => 'min:8|max:13',
+        ]);
 
+        if ($validator->fails()){
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+        }
+
+        $user = User::find($id);
+        $user->name = $request->input('name');
+        $student= $user->student;
+        $student->father_name = $request->input('father_name');
+        $student->class = $request->input('class');
+        $student->contact_no = $request->input('contact_no');
+        $student->address = $request->input('address');
+        $student->update();
+        $user->update();
+
+        return redirect()->route('admin.get_student_management')->with('success' , 'Student Edit Successfully');
 
     }
 
