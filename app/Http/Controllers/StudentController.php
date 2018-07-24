@@ -10,7 +10,6 @@ use Auth;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\View;
 
 class StudentController extends Controller
 {
@@ -136,7 +135,6 @@ class StudentController extends Controller
         $days = $userModel->sandwich_leave($leave_start,$leave_end);
 
         $leave = new StudentLeave();
-        $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
         $leave->leave_to = $request->input('leave_to');
         $leave->leave_start = $leave_start->toDateString();
@@ -144,7 +142,9 @@ class StudentController extends Controller
         $leave->leave_days = $days;
         $leave->leave_description = $request->input('leave_description');
 
-        $result = $leave->save();
+        $user = User::find($user->id);
+        $result = $user->student_leaves()->save($leave);
+
         if (!$result){
             $errors = array(['add_leave' => 'Problem to Create Leave']);
             return redirect()->back()->withErrors($errors);

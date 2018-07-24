@@ -311,10 +311,9 @@ class AdminController extends Controller
         $user->save();
 
         $teacher = new Teacher();
-        $teacher->user_id = $user->id;
         $teacher->contact_no = $request->input('contact_no');
         $teacher->address = $request->input('address');
-        $teacher = $teacher->save();
+        $teacher = $user->teacher()->save($teacher);
 
         if (!$teacher){
             return redirect()->back()->with('error','Problem to Create Teacher');
@@ -347,7 +346,7 @@ class AdminController extends Controller
         if (!$user){
             return redirect()->back()->with('error','User Not Found');
         }
-        $teacherDetails = Teacher::where('user_id',$id)->first();
+        $teacherDetails = $user->teacher;
         if (!$teacherDetails){
             return redirect()->back()->with('error','Student Details Not Found');
         }
@@ -464,12 +463,11 @@ class AdminController extends Controller
         $user->save();
 
         $student = new Student();
-        $student->user_id = $user->id;
         $student->class = $request->input('class');
         $student->father_name = $request->input('father_name');
         $student->contact_no = $request->input('contact_no');
         $student->address = $request->input('address');
-        $student = $student->save();
+        $student = $user->student()->save($student);
 
         if (!$student){
             return redirect()->back()->with('error','Problem to Create Student');
@@ -498,7 +496,7 @@ class AdminController extends Controller
         if (!$user){
             return redirect()->back()->with('error','User Not Found');
         }
-        $studentDetails = Student::where('user_id',$id)->first();
+        $studentDetails = $user->student;
         if (!$studentDetails){
             return redirect()->back()->with('error','Student Details Not Found');
         }

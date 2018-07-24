@@ -229,14 +229,15 @@ class TeacherController extends Controller
         $days = $userModel->sandwich_leave($leave_start,$leave_end);
 
         $leave = new TeacherLeave();
-        $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
         $leave->leave_start = $leave_start->toDateString();
         $leave->leave_end = $leave_end->toDateString();
         $leave->leave_days = $days;
         $leave->leave_description = $request->input('leave_description');
 
-        $result = $leave->save();
+        $user = User::find($user->id);
+        $result = $user->teacher_leaves()->save($leave);
+
         if (!$result){
             $errors = array(['add_leave' => 'Problem to Create Leave']);
             return redirect()->back()->withErrors($errors);
@@ -264,7 +265,6 @@ class TeacherController extends Controller
         }
 
         $leave = TeacherLeave::find($id);
-        $leave->user_id = $user->id;
         $leave->leave_reason = $request->input('leave_reason');
         $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
         $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();

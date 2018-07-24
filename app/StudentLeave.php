@@ -8,4 +8,8 @@ class StudentLeave extends Model
 {
     //
     protected $table = 'student_leave';
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }
