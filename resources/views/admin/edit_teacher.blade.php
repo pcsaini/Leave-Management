@@ -19,28 +19,28 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="name">Teacher Name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Enter Teacher Name" name="name" value="{{ $teacher->name }}">
+                            <input type="text" class="form-control" id="name" placeholder="Enter Teacher Name" name="name" value="{{ old('name') == '' ? $teacher->name : old('name')}}">
                             @if($errors->has('name'))
                                 <label class="text-danger">{{ $errors->first('name') }}</label>
                             @endif
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter Email Address" name="email" value="{{ $teacher->email }}" disabled>
+                            <input type="email" class="form-control" id="email" placeholder="Enter Email Address" name="email" value="{{ old('email') == '' ? $teacher->email : old('email')}}" disabled>
                             @if($errors->has('email'))
                                 <label class="text-danger">{{ $errors->first('email') }}</label>
                             @endif
                         </div>
                         <div class="form-group">
                             <label for="contact_no">Contact Number</label>
-                            <input type="number" class="form-control" id="contact_no" placeholder="Enter Contact Number" name="contact_no" value="{{ $teacher->contact_no }}">
+                            <input type="number" class="form-control" id="contact_no" placeholder="Enter Contact Number" name="contact_no" value="{{ old('contact_no') == '' ? $teacher->contact_no : old('contact_no')}}">
                             @if($errors->has('contact_no'))
                                 <label class="text-danger">{{ $errors->first('contact_no') }}</label>
                             @endif
                         </div>
                         <div class="form-group">
                             <label>Address</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Address" name="address">{{ $teacher->address }}</textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Address" name="address">{{ old('address') == '' ? $teacher->address : old('address')}}</textarea>
                         </div>
 
 

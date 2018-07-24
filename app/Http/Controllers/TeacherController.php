@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Validator;
 class TeacherController extends Controller
 {
     //
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getDashboard(){
         $user_id = Auth::id();
         $user = DB::table('users')
@@ -23,6 +26,9 @@ class TeacherController extends Controller
         return view('teacher.dashboard',['user' => $user]);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getEditProfile(){
         $user_id = Auth::id();
         $teacher = DB::table('users')
@@ -32,6 +38,10 @@ class TeacherController extends Controller
         return view('teacher.edit_profile',['teacher' => $teacher]);
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editProfile(Request $request){
         $user_id = Auth::id();
         $validator = Validator::make($request->all(),[
@@ -54,10 +64,16 @@ class TeacherController extends Controller
         return redirect()->route('teacher.dashboard')->with('success' , 'Teacher Edit Successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getLeaveManagement(){
         return view('teacher.leave');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getAllLeave(Request $request){
         $user_id = Auth::id();
         $columns  = array(
@@ -131,10 +147,16 @@ class TeacherController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getStudentLeaveManagement(){
         return view('teacher.student_leave');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getAllStudentLeave(Request $request){
         $user = Auth::user();
         $columns  = array(
@@ -214,6 +236,10 @@ class TeacherController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function approveStudentLeave($id){
         $user_id = Auth::id();
         $leave = StudentLeave::find($id);
@@ -236,10 +262,17 @@ class TeacherController extends Controller
         return redirect()->back()->with('success','Leave Approved Successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getAddLeave(){
         return view('teacher.add_leave');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addLeave(Request $request){
         $user = Auth::user();
         $leave_date = explode('-',$request->input('leave_range'));
@@ -251,7 +284,7 @@ class TeacherController extends Controller
             'leave_end' => 'required|date'
         ]);
         if ($validator->fails()){
-            return redirect()->back()->withErrors($validator->errors());
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
         }
 
         $leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')));
@@ -272,16 +305,25 @@ class TeacherController extends Controller
 
         if (!$result){
             $errors = array(['add_leave' => 'Problem to Create Leave']);
-            return redirect()->back()->withErrors($errors);
+            return redirect()->back()->withErrors($errors)->withInput($request->all());
         }
         return redirect()->route('teacher.get_leave_management')->with('success','Leave Created Successfully');
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getEditLeave($id){
         $leave = TeacherLeave::find($id);
         return view('teacher.edit_leave',['leave' => $leave]);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editLeave(Request $request, $id){
         $user = Auth::user();
         $leave_date = explode('-',$request->input('leave_range'));
@@ -293,7 +335,7 @@ class TeacherController extends Controller
             'leave_end' => 'required|date'
         ]);
         if ($validator->fails()){
-            return redirect()->back()->withErrors($validator->errors());
+            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
         }
 
         $leave = TeacherLeave::find($id);
@@ -306,11 +348,15 @@ class TeacherController extends Controller
         $result = $user->teacher_leaves()->save($leave);
         if (!$result){
             $errors = array(['add_leave' => 'Problem to Create Leave']);
-            return redirect()->back()->withErrors($errors);
+            return redirect()->back()->withErrors($errors)->withInput($request->all());
         }
         return redirect()->route('teacher.get_leave_management')->with('success','Leave Edit Successfully');
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteLeave($id){
         $leave = TeacherLeave::find($id);
         if (!$leave){

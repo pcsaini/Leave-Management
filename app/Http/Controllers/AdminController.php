@@ -11,20 +11,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Stevebauman\Location\Facades\Location;
 
 class AdminController extends Controller
 {
     //
-    public function getDashboard(){
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function getDashboard(Request $request){
         $user = Auth::user();
         return view('admin.dashboard',['user' => $user]);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getTeacherLeaveManagement(){
         return view('admin.teacher_leave');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getTeachersAllLeave(Request $request){
         $columns  = array(
             0 => 'id',
@@ -96,6 +104,10 @@ class AdminController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function approveTeacherLeave($id){
         $leave = TeacherLeave::find($id);
 
@@ -114,10 +126,16 @@ class AdminController extends Controller
         return redirect()->back()->with('success','Leave Approved Successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getStudentLeaveManagement(){
         return view('admin.student_leave');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getStudentsAllLeave(Request $request){
         $columns  = array(
             0 => 'id',
@@ -195,6 +213,10 @@ class AdminController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function approveStudentLeave($id){
         $leave = StudentLeave::find($id);
 
@@ -213,10 +235,16 @@ class AdminController extends Controller
         return redirect()->back()->with('success','Leave Approved Successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getTeacherManagement(){
         return view('admin.teacher_mang');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getAllTeacher(Request $request){
         $columns  = array(
             0 => 'id',
@@ -288,10 +316,17 @@ class AdminController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getAddTeacher(){
         return view('admin.add_teacher');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addTeacher(Request $request){
         $validator = Validator::make($request->all(),[
             'name' => 'required|max:20',
@@ -316,7 +351,7 @@ class AdminController extends Controller
         $teacher = $user->teacher()->save($teacher);
 
         if (!$teacher){
-            return redirect()->back()->with('error','Problem to Create Teacher');
+            return redirect()->back()->with('error','Problem to Create Teacher')->withInput($request->all());
         }
 
         return redirect()->route('admin.get_teacher_management')->with('success' , 'Teacher Add Successfully');
@@ -324,6 +359,10 @@ class AdminController extends Controller
 
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getEditTeacher($id){
        $teacher = DB::table('users')
             ->leftJoin('teacher_details','teacher_details.user_id','=','users.id')
@@ -333,6 +372,11 @@ class AdminController extends Controller
         return view('admin.edit_teacher',['teacher' => $teacher]);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editTeacher(Request $request, $id){
         $validator = Validator::make($request->all(),[
             'name' => 'required|max:20',
@@ -354,6 +398,10 @@ class AdminController extends Controller
         return redirect()->route('admin.get_teacher_management')->with('success' , 'Teacher Edit Successfully');
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteTeacher($id){
         $user = User::find($id);
         if (!$user){
@@ -369,10 +417,16 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'user Delete Successfully');
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getStudentManagement(){
         return view('admin.student_mang');
     }
 
+    /**
+     * @param Request $request
+     */
     public function getAllStudent(Request $request){
         $columns  = array(
             0 => 'id',
@@ -452,10 +506,17 @@ class AdminController extends Controller
         echo json_encode($json_data);
     }
 
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getAddStudent(){
         return view('admin.add_student');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function addStudent(Request $request){
         $validator = Validator::make($request->all(),[
             'name' => 'required|max:20',
@@ -483,13 +544,17 @@ class AdminController extends Controller
         $student = $user->student()->save($student);
 
         if (!$student){
-            return redirect()->back()->with('error','Problem to Create Student');
+            return redirect()->back()->with('error','Problem to Create Student')->withInput($request->all());
         }
 
         return redirect()->route('admin.get_student_management')->with('success' , 'Student Add Successfully');
 
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getEditStudent($id){
         $student = DB::table('users')
             ->leftJoin('student_details','student_details.user_id','=','users.id')
@@ -499,6 +564,11 @@ class AdminController extends Controller
         return view('admin.edit_student',['student' => $student]);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function editStudent(Request $request, $id){
         $validator = Validator::make($request->all(),[
             'name' => 'required|max:20',
@@ -524,6 +594,10 @@ class AdminController extends Controller
 
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function deleteStudent($id){
         $user = User::find($id);
         if (!$user){

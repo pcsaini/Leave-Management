@@ -27,7 +27,7 @@
                     <div class="box-body">
                         <div class="form-group">
                             <label for="leave_reason">Leave Reason</label>
-                            <input type="text" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason" value="{{ $leave->leave_reason }}">
+                            <input type="text" class="form-control" id="leave_reason" placeholder="Enter Reason for Leave" name="leave_reason" value="{{ old('leave_reason') == '' ? $leave->leave_reason : old('leave_reason') }}">
                             @if($errors->has('leave_reason'))
                                 <label class="text-danger">{{ $errors->first('leave_reason') }}</label>
                             @endif
@@ -39,7 +39,7 @@
                                 <div class="input-group-addon">
                                     <i class="fa fa-calendar"></i>
                                 </div>
-                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range" value="{{ date('m/d/Y',strtotime($leave->leave_start)).' - '.date('m/d/Y',strtotime($leave->leave_end)) }}">
+                                <input type="text" class="form-control pull-right" id="leave_range" name="leave_range" value="{{ old('leave_range') == '' ? date('m/d/Y',strtotime($leave->leave_start)).' - '.date('m/d/Y',strtotime($leave->leave_end)) : old('leave_range') }}">
                             </div>
                             @if($errors->has('leave_start') OR $errors->has('leave_end'))
                                 <label class="text-danger">{{ $errors->first('leave_start').','. $errors->first('leave_end')}}</label>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="form-group">
                             <label>Description</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Description" name="leave_description">{{ $leave->leave_description }}</textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Description" name="leave_description">{{ old('leave_description') == '' ? $leave->leave_description : old('leave_description') }}</textarea>
                         </div>
                     </div>
 

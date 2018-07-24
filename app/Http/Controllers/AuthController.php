@@ -9,10 +9,17 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function getLogin(){
         return view('login');
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function login(Request $request){
         $validator = Validator::make($request->all(),[
             'email' => 'required|email',
@@ -20,7 +27,7 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()){
-            return redirect()->route('get_login')->withErrors($validator->errors())->withInput();
+            return redirect()->route('get_login')->withErrors($validator->errors())->withInput($request->all());
         }
 
         $email = $request->input('email');
@@ -37,9 +44,12 @@ class AuthController extends Controller
             }
         }
 
-        return redirect()->route('get_login')->withErrors(array('login_error' => 'Wrong Email or Password'));
+        return redirect()->route('get_login')->withErrors(array('login_error' => 'Wrong Email or Password'))->withInput($request->all());
     }
 
+    /**
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function logout(){
         Auth::logout();
         return redirect()->route('get_login');
