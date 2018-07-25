@@ -51,7 +51,7 @@ class User extends Authenticatable
             }elseif ($end->isSunday()){
                 $days = $end->diffInDays($start) - 1;
             }elseif ($end->isMonday()){
-                $days = $end->diffInDays($start) + 2;
+                $days = $end->diffInDays($start) + 1;
             }else{
                 $days = $end->diffInDays($start) + 1;
             }

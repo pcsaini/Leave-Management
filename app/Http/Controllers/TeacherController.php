@@ -338,10 +338,17 @@ class TeacherController extends Controller
             return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
         }
 
+        $leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')));
+        $leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')));
+
+        $userModel = new User();
+        $days = $userModel->sandwich_leave($leave_start,$leave_end);
+
         $leave = TeacherLeave::find($id);
         $leave->leave_reason = $request->input('leave_reason');
-        $leave->leave_start = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_start')))->toDateString();
-        $leave->leave_end = Carbon::createFromFormat('m/d/Y',trim($request->input('leave_end')))->toDateString();
+        $leave->leave_start = $leave_start->toDateString();
+        $leave->leave_end = $leave_end->toDateString();
+        $leave->leave_days = $days;
         $leave->leave_description = $request->input('leave_description');
 
         $user = User::find($user->id);
